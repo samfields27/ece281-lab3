@@ -36,18 +36,18 @@
 --|					can be changed by the inputs
 --|					
 --|
---|                 One Hot State Encoding key
+--|                 Binary State Encoding key
 --|                 --------------------
 --|                  State | Encoding
 --|                 --------------------
---|                  OFF   | 10000000
---|                  ON    | 00000001
---|                  R1    | 00000010
---|                  R2    | 00000100
---|                  R3    | 00001000
---|                  L1    | 00010000
---|                  L2    | 00100000
---|                  L3    | 01000000
+--|                  OFF   | 000
+--|                  ON    | 111
+--|                  R1    | 001
+--|                  R2    | 010
+--|                  R3    | 011
+--|                  L1    | 100
+--|                  L2    | 101
+--|                  L3    | 110
 --|                 --------------------
 --|
 --|
@@ -96,15 +96,28 @@ end thunderbird_fsm;
 
 architecture thunderbird_fsm_arch of thunderbird_fsm is 
 
+	signal f_S : STD_LOGIC_vector(2 downto 0) :="000";
+	signal f_S_next: std_logic_vector(2 downto 0)  :="000";
+
 -- CONSTANTS ------------------------------------------------------------------
   
 begin
 
 	-- CONCURRENT STATEMENTS --------------------------------------------------------	
-	
+	f_S_next(0) <= ((not f_S(2)) and (not f_S(1)) and (not f_S(0)) and i_left and i_right) or (f_S(1) and (not f_S(0)));
+ 	f_S_next(1) <= ( (not f_S(2)) and (not f_S(1)) and (not f_S(0)) and (not i_left) and i_right ) or 
+	               ( f_S(2) and (not f_S(1)) and f_S(0) ) or ( f_S(1) and (not f_S(0)) );
+	f_S_next(2) <= ( (not f_S(2)) and (not f_S(1)) and (not f_S(0)) and i_left and (not i_right) ) or ( f_S(2) and (not f_S(1)) and f_S(0) ) or 
+	                   ( (not f_S(2)) and f_S(1) and f_S(0)) or (f_S(2) and f_S(1) and (not f_S(0)));
     ---------------------------------------------------------------------------------
 	
 	-- PROCESSES --------------------------------------------------------------------
+	o_lights_L(0) <= ((not f_S(2)) and (not f_S(1)) and f_S(0)) or (f_S(2) and f_S(0)) or (f_S(2) and f_S(1) and (not f_S(0)));
+	o_lights_L(1) <= ((not f_S(2)) and (not f_S(1)) and f_S(0)) or (f_S(1) and f_S(2));
+	o_lights_L(2) <= ((not f_S(2)) and (not f_S(1)) and f_S(0)) or (f_S(2) and f_S(1) and f_S(0));
+	o_lights_R(0) <= ((not f_S(2)) and f_S(1) and (not f_S(0))) or ((not f_S(2)) and f_S(0)) or (f_S(2) and (not f_S(1)) and (not f_S(0)));
+	o_lights_R(1) <= (f_S(2) and (not f_S(1)) and (not f_S(0))) or (( not f_S(2)) and f_S(0));
+	o_lights_R(2) <= ((not f_S(2)) and (not f_S(1)) and f_S(0)) or (f_S(2) and (not f_S(1)) and (not f_S(0)));
     
 	-----------------------------------------------------					   
 				  
