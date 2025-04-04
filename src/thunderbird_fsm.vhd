@@ -104,11 +104,11 @@ architecture thunderbird_fsm_arch of thunderbird_fsm is
 begin
 
 	-- CONCURRENT STATEMENTS --------------------------------------------------------	
-	f_S_next(0) <= ((not f_S(2)) and (not f_S(1)) and (not f_S(0)) and i_left and i_right) or (f_S(1) and (not f_S(0)));
- 	f_S_next(1) <= ( (not f_S(2)) and (not f_S(1)) and (not f_S(0)) and (not i_left) and i_right ) or 
-	               ( f_S(2) and (not f_S(1)) and f_S(0) ) or ( f_S(1) and (not f_S(0)) );
-	f_S_next(2) <= ( (not f_S(2)) and (not f_S(1)) and (not f_S(0)) and i_left and (not i_right) ) or ( f_S(2) and (not f_S(1)) and f_S(0) ) or 
-	                   ( (not f_S(2)) and f_S(1) and f_S(0)) or (f_S(2) and f_S(1) and (not f_S(0)));
+	f_S_next(0) <= ((not f_S(2)) and (not f_S(1)) and (not f_S(0)) and (not i_left) and i_right) or ((not f_S(2)) and (not f_S(1)) and (not f_S(0)) and i_left and i_right) or
+	               ((not f_S(2)) and f_S(1) and (not f_S(0))) or (f_S(2) and (not f_S(1)) and (not f_S(0)));
+ 	f_S_next(1) <= ((not f_S(2)) and (not f_S(1)) and (not f_S(0)) and i_left and i_right) or ((not f_S(2)) and (not f_S(1)) and f_S(0)) or (not f_S(2) and f_S(1) and (not f_S(0))) or
+	                   (f_S(2) and (not f_S(1)) and f_S(0));
+	f_S_next(2) <= ((not f_S(2)) and (not f_S(1)) and (not f_S(0)) and i_left and i_right) or ((not f_S(2)) and (not f_S(1)) and (not f_S(0)) and i_left and (not i_right)) or (f_S(2) and (not f_S(1)) and f_S(0)) or (f_S(2) and (not f_S(1)) and (not f_S(0)));
     ---------------------------------------------------------------------------------
 	
 	-- PROCESSES --------------------------------------------------------------------
@@ -119,6 +119,14 @@ begin
 	o_lights_R(1) <= (f_S(2) and (not f_S(1)) and (not f_S(0))) or (( not f_S(2)) and f_S(0));
 	o_lights_R(2) <= ((not f_S(2)) and (not f_S(1)) and f_S(0)) or (f_S(2) and (not f_S(1)) and (not f_S(0)));
     
+    	register_proc : process  ( i_clk,  i_reset ) -- Used from ice 4
+    begin
+        if i_reset = '1' then 
+            f_S <= "000"; 
+        elsif rising_edge(i_clk) then 
+            f_S <= f_S_next; 
+        end if; 
+	end process  register_proc;
 	-----------------------------------------------------					   
 				  
 end thunderbird_fsm_arch;

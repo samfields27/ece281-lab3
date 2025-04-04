@@ -92,7 +92,7 @@ begin
           i_right => w_right,
           o_Lights_L => w_lightsL,
           o_Lights_R => w_lightsR
-          
+         
 
         );
 	
@@ -112,46 +112,40 @@ begin
 	-----------------------------------------------------
 	
 	-- Test Plan Process --------------------------------
-		sim_proc: process
-	begin
-		-- sequential timing		
-		w_reset <= '1';
-		wait for k_clk_period*1;
-		  assert w_lightsL = "000" report "bad reset" severity failure;
-		  
-		w_reset <= '1';
-		wait for k_clk_period*1;
-		  assert w_lightsR = "000" report "bad reset" severity failure;
-		
-		w_reset <= '0';
-		wait for k_clk_period*1;
-		
-		-- red light
-		w_C <= '0'; wait for k_clk_period;
-          assert w_stoplight = "100" report "should be red when no car" severity failure;
-		-- car shows up at red light
-        w_C <= '1'; wait for k_clk_period;
-            assert w_stoplight = "001" report "should be green when car present" severity failure;
-        wait for k_clk_period * 3; -- stay green
-            assert w_stoplight = "001" report "should be green when car present" severity failure;
-        -- go to yellow
-        w_C <= '0'; wait for k_clk_period;
-            assert w_stoplight = "010" report "should be yellow when cars done" severity failure;
-        wait for k_clk_period; -- time to go to red
-            assert w_stoplight = "100" report "did not go red after yellow" severity failure;
+		sim_proc : process
+    begin
+        -- reset
+        w_reset <= '1'; 
+        wait for k_clk_period*2;
         
-        -- reset and test yellow to red even if car
-        w_reset <= '1'; w_C <= '1';
-            wait for k_clk_period;
-        w_reset <= '0';
-          assert w_stoplight = "010" report "bad reset" severity failure;
-        wait for k_clk_period;
-            assert w_stoplight = "100" report "skipped red after yellow" severity failure;
-        wait for k_clk_period;
-            assert w_stoplight = "001" report "should be green when car present" severity failure;
-	
-		wait;
-	end process;
+        
+        assert (w_lights_L = "000") report "lightsL Reset" severity error;
+        
+        assert (w_lights_R = "000") report "lightsR Reset" severity error;
+        
+        w_left <= '1'; 
+        w_right <= '0'; 
+        wait for k_clk_period * 2; 
+        
+        
+        assert (w_lights_L = "001")  report "lightsL during first transition" severity error;
+        
+        assert (w_lights_R = "000")  report "lightsR during first transition" severity error;
+        -- New values for test
+        
+        w_left <= '0'; 
+        w_right <= '1'; 
+        wait for k_clk_period * 2; 
+       
+        
+        -- 
+        
+        assert (w_lights_L = "000") report "lightsL during second transition" severity error;
+        
+        assert (w_lights_R = "001") report "lightsR during second transition" severity error;
+ 
+        wait;
+    end process;
 	
 	
 	
