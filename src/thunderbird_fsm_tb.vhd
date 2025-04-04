@@ -119,18 +119,18 @@ begin
         wait for k_clk_period*2;
         
         
-        assert (w_lights_L = "000") report "lightsL Reset" severity error;
+        assert (w_lightsL = "000") report "lightsL Reset" severity error;
         
-        assert (w_lights_R = "000") report "lightsR Reset" severity error;
+        assert (w_lightsR = "000") report "lightsR Reset" severity error;
         
         w_left <= '1'; 
         w_right <= '0'; 
         wait for k_clk_period * 2; 
         
+        -- keep variable names same
+        assert (w_lightsL = "001")  report "lightsL during first transition" severity error;
         
-        assert (w_lights_L = "001")  report "lightsL during first transition" severity error;
-        
-        assert (w_lights_R = "000")  report "lightsR during first transition" severity error;
+        assert (w_lightsR = "000")  report "lightsR during first transition" severity error;
         -- New values for test
         
         w_left <= '0'; 
@@ -140,9 +140,9 @@ begin
         
         -- 
         
-        assert (w_lights_L = "000") report "lightsL during second transition" severity error;
+        assert (w_lightsL = "000") report "lightsL during second transition" severity error;
         
-        assert (w_lights_R = "001") report "lightsR during second transition" severity error;
+        assert (w_lightsR = "001") report "lightsR during second transition" severity error;
  
         wait;
     end process;
